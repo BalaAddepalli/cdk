@@ -52,6 +52,18 @@ export class PipelineStack extends cdk.Stack {
       ],
     }));
 
+    // Add AWS security services permissions
+    (buildProject.role as iam.Role).addToPolicy(new iam.PolicyStatement({
+      actions: [
+        'codeguru-reviewer:CreateCodeReview',
+        'codeguru-reviewer:DescribeCodeReview',
+        'codeguru-reviewer:ListRecommendations',
+        'inspector2:ListFindings',
+        'inspector2:BatchGetFindingDetails'
+      ],
+      resources: ['*'],
+    }));
+
     new codepipeline.Pipeline(this, 'Pipeline', {
       pipelineType: codepipeline.PipelineType.V2,
       stages: [

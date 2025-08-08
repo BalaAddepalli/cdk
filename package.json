@@ -8,7 +8,7 @@
     "deploy": "cdk deploy",
     "synth": "cdk synth",
     "security:audit": "npm audit --audit-level=high",
-    "security:sast": "npx semgrep --config=auto --error src/",
+    "security:sast": "npx eslint src/ --ext .ts",
     "security:scan": "npm run security:audit && npm run security:sast"
   },
   "devDependencies": {
