@@ -48,18 +48,11 @@ export class LambdaStack extends cdk.Stack {
       binaryMediaTypes: ['image/*', 'application/pdf']
     });
 
-    // Add specific resource with throttling
+    // Add specific resource
     const resource = api.root.addResource('hello');
-    const method = resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction, {
+    resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction, {
       requestTemplates: { 'application/json': '{ "statusCode": "200" }' }
     }));
-
-    // Add throttling at method level
-    const cfnMethod = method.node.defaultChild as apigateway.CfnMethod;
-    cfnMethod.addPropertyOverride('ThrottleSettings', {
-      RateLimit: 100,
-      BurstLimit: 200
-    });
 
     // CloudWatch Alarms for monitoring
     const errorAlarm = new cdk.aws_cloudwatch.Alarm(this, 'LambdaErrorAlarm', {
