@@ -82,18 +82,19 @@ Internet → API Gateway → Lambda
 ```
 Code → Security Scan → Build → Test → Deploy
   ↓         ↓           ↓       ↓       ↓
-GitHub → (Future) → CodeBuild → Test → Lambda
+GitHub → SAST+Deps → CodeBuild → Test → Lambda
 ```
 
 **Current Controls**:
 - ✅ **Source Control**: Private repository
-- ✅ **Dependency Management**: npm audit in CI/CD
+- ✅ **SAST Scanning**: Semgrep static analysis (high severity)
+- ✅ **Dependency Scanning**: npm audit vulnerability detection
 - ✅ **Error Handling**: No sensitive data in error responses
 - ✅ **Input Validation**: Proper request handling
 
-**Recommended Additions**:
-- 🔄 **SAST**: Static Application Security Testing
-- 🔄 **Dependency Scanning**: Automated vulnerability scanning
+**Implemented Security Scanning**:
+- ✅ **SAST**: Semgrep static analysis in CI/CD pipeline
+- ✅ **Dependency Scanning**: npm audit for vulnerability detection
 - 🔄 **Container Scanning**: If containerized deployment
 
 #### Runtime Security
@@ -188,8 +189,8 @@ Application → CloudWatch → Alarms → Notifications
 
 2. **Dependency Vulnerabilities**
    - **Risk**: Third-party package vulnerabilities
-   - **Mitigation**: npm audit, regular updates
-   - **Status**: PARTIALLY MITIGATED 🔄
+   - **Mitigation**: Automated npm audit in CI/CD, build fails on high severity
+   - **Status**: MITIGATED ✅
 
 #### LOW RISK
 1. **Information Disclosure**
@@ -214,8 +215,8 @@ Low      Info Disc  Deps      -
 ## Security Recommendations
 
 ### Immediate Actions (0-30 days)
-1. **Implement SAST scanning** in CI/CD pipeline
-2. **Add dependency vulnerability scanning**
+1. ✅ **Implement SAST scanning** in CI/CD pipeline (COMPLETED)
+2. ✅ **Add dependency vulnerability scanning** (COMPLETED)
 3. **Configure security alerting** to SOC team
 4. **Create security incident runbook**
 
@@ -274,8 +275,9 @@ Low      Info Disc  Deps      -
 │ • Failed Authentication Attempts: 0                    │
 │ • API Gateway 4xx Errors: < 1%                        │
 │ • Lambda Function Errors: < 0.1%                      │
-│ • Security Scan Failures: 0                           │
-│ • Vulnerability Count: Low                             │
+│ • SAST Scan Results: 0 high severity findings        │
+│ • Dependency Vulnerabilities: 0 high/critical        │
+│ • Security Build Failures: 0                         │
 │ • Mean Time to Detection (MTTD): < 5 minutes          │
 │ • Mean Time to Response (MTTR): < 30 minutes          │
 └─────────────────────────────────────────────────────────┘
