@@ -24,7 +24,28 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
-    (buildProject.role as iam.Role).addToPolicy(new iam.PolicyStatement({
+    const deployProject = new codebuild.PipelineProject(this, 'DeployProject', {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            'runtime-versions': { nodejs: 18 },
+            commands: ['npm ci'],
+          },
+          build: {
+            commands: [
+              `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole --role-session-name pipeline-deploy`,
+              'cdk deploy --require-approval never',
+            ],
+          },
+        },
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+      },
+    });
+
+    (deployProject.role as iam.Role).addToPolicy(new iam.PolicyStatement({
       actions: ['sts:AssumeRole'],
       resources: [`arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole`],
     }));
@@ -61,27 +82,7 @@ export class PipelineStack extends cdk.Stack {
           actions: [
             new codepipeline_actions.CodeBuildAction({
               actionName: 'Deploy',
-              project: new codebuild.PipelineProject(this, 'DeployProject', {
-                buildSpec: codebuild.BuildSpec.fromObject({
-                  version: '0.2',
-                  phases: {
-                    install: {
-                      'runtime-versions': { nodejs: 18 },
-                      commands: ['npm ci'],
-                    },
-                    build: {
-                      commands: [
-                        `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole --role-session-name pipeline-deploy`,
-                        'cdk deploy --require-approval never',
-                      ],
-                    },
-                  },
-                }),
-                environment: {
-                  buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
-                },
-
-              }),
+              project: deployProject,
               input: buildOutput,
             }),
           ],
