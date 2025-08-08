@@ -34,7 +34,7 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole --role-session-name pipeline-deploy`,
+              `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole --role-session-name pipeline-deploy --external-id ${props.workloadAccountId}`,
               'cdk deploy --require-approval never',
             ],
           },
