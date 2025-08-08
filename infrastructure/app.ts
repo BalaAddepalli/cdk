@@ -13,7 +13,7 @@ const githubRepo = 'cdk';
 
 // Deploy pipeline in CI/CD account
 new PipelineStack(app, 'TypeScriptLambdaPipeline', {
-  env: { account: cicdAccountId, region: 'us-east-1' },
+  env: { account: cicdAccountId, region: 'eu-central-1' },
   workloadAccountId,
   githubOwner,
   githubRepo,
@@ -21,5 +21,5 @@ new PipelineStack(app, 'TypeScriptLambdaPipeline', {
 
 // Deploy Lambda in workload account
 new LambdaStack(app, 'TypeScriptLambdaStack', {
-  env: { account: workloadAccountId, region: 'us-east-1' },
+  env: { account: workloadAccountId, region: 'eu-central-1' },
 });

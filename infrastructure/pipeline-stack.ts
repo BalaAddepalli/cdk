@@ -24,27 +24,23 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
-    const crossAccountRole = new iam.Role(this, 'CrossAccountDeployRole', {
-      assumedBy: buildProject.role!,
-      roleName: 'CodePipelineCrossAccountRole',
-      externalIds: [props.workloadAccountId],
-    });
-
-    crossAccountRole.addToPolicy(new iam.PolicyStatement({
+    (buildProject.role as iam.Role).addToPolicy(new iam.PolicyStatement({
       actions: ['sts:AssumeRole'],
-      resources: [`arn:aws:iam::${props.workloadAccountId}:role/CrossAccountDeploymentRole`],
+      resources: [`arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole`],
     }));
 
     new codepipeline.Pipeline(this, 'Pipeline', {
+      pipelineType: codepipeline.PipelineType.V2,
       stages: [
         {
           stageName: 'Source',
           actions: [
-            new codepipeline_actions.GitHubSourceAction({
+            new codepipeline_actions.CodeStarConnectionsSourceAction({
               actionName: 'GitHub_Source',
               owner: props.githubOwner,
               repo: props.githubRepo,
-              oauthToken: cdk.SecretValue.secretsManager('github-token'),
+              connectionArn: 'arn:aws:codeconnections:eu-central-1:642244225184:connection/760d32e5-09d1-48b7-b67c-98d42e2ff8c2',
+              branch: 'main',
               output: sourceOutput,
             }),
           ],
@@ -75,7 +71,7 @@ export class PipelineStack extends cdk.Stack {
                     },
                     build: {
                       commands: [
-                        `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/CrossAccountDeploymentRole --role-session-name pipeline-deploy`,
+                        `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole --role-session-name pipeline-deploy`,
                         'cdk deploy --require-approval never',
                       ],
                     },
@@ -84,7 +80,7 @@ export class PipelineStack extends cdk.Stack {
                 environment: {
                   buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
                 },
-                role: crossAccountRole,
+
               }),
               input: buildOutput,
             }),

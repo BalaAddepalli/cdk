@@ -10,28 +10,18 @@ AWS TypeScript Lambda function with cross-account CI/CD deployment using CodePip
 
 ## Setup
 
-1. **Create GitHub Personal Access Token**
-   ```bash
-   aws secretsmanager create-secret --name github-token --secret-string "your-token"
-   ```
-
-2. **Setup Cross-Account Role** (in workload account)
-   ```bash
-   ./scripts/setup-cross-account-role.sh
-   ```
-
-3. **Install Dependencies**
+1. **Install Dependencies**
    ```bash
    npm install
    ```
 
-4. **Deploy Pipeline** (in CI/CD account)
+2. **Deploy Pipeline** (in CI/CD account)
    ```bash
    cdk bootstrap
    cdk deploy TypeScriptLambdaPipeline
    ```
 
-5. **Deploy Lambda** (in workload account)
+3. **Deploy Lambda** (in workload account)
    ```bash
    cdk deploy TypeScriptLambdaStack
    ```

@@ -17,8 +17,7 @@ export class LambdaStack extends cdk.Stack {
     });
 
     new apigateway.LambdaRestApi(this, 'LambdaApi', {
-      handler: lambdaFunction,
-      proxy: false
+      handler: lambdaFunction
     });
   }
 }
