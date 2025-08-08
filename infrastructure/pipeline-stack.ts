@@ -46,7 +46,10 @@ export class PipelineStack extends cdk.Stack {
 
     (deployProject.role as iam.Role).addToPolicy(new iam.PolicyStatement({
       actions: ['sts:AssumeRole'],
-      resources: [`arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole`],
+      resources: [
+        `arn:aws:iam::${props.workloadAccountId}:role/BalaCrossAccountDeploymentRole`,
+        `arn:aws:iam::${props.workloadAccountId}:role/cdk-hnb659fds-deploy-role-${props.workloadAccountId}-eu-central-1`
+      ],
     }));
 
     new codepipeline.Pipeline(this, 'Pipeline', {
