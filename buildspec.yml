@@ -6,6 +6,7 @@ phases:
       nodejs: 18
     commands:
       - npm ci
+      - npm install -g aws-cdk
   pre_build:
     commands:
       - npm run test
