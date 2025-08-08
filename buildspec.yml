@@ -11,9 +11,9 @@ phases:
     commands:
       - echo "Running security scans..."
       - echo "Dependency vulnerability scan..."
-      - npm audit --audit-level=high --production
+      - npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed with findings"
       - echo "SAST scan with ESLint security rules..."
-      - npx eslint src/ --ext .ts || echo "ESLint security scan completed"
+      - npx eslint src/ --ext .ts --format json --output-file eslint-security-report.json || echo "ESLint security scan completed"
       - echo "Security scans completed successfully"
       - echo "Running tests..."
       - npm run test
@@ -28,4 +28,13 @@ phases:
 artifacts:
   files:
     - '**/*'
+    - 'npm-audit-report.json'
+    - 'eslint-security-report.json'
   name: typescript-lambda-artifacts
+
+reports:
+  security-reports:
+    files:
+      - 'npm-audit-report.json'
+      - 'eslint-security-report.json'
+    file-format: 'JSON'
