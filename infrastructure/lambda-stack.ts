@@ -31,32 +31,35 @@ export class LambdaStack extends cdk.Stack {
       proxy: false,
       deployOptions: {
         stageName: 'prod',
-        throttle: {
-          rateLimit: 100,
-          burstLimit: 200
-        },
         loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         dataTraceEnabled: false,
         metricsEnabled: true,
-        cachingEnabled: true, // Enable caching for better performance
+        cachingEnabled: true,
         cacheClusterEnabled: true,
-        cacheClusterSize: '0.5', // Smallest cache size for cost optimization
-        cacheTtl: cdk.Duration.minutes(5) // 5-minute cache TTL
+        cacheClusterSize: '0.5',
+        cacheTtl: cdk.Duration.minutes(5)
       },
       defaultCorsPreflightOptions: {
-        allowOrigins: ['https://*.yourdomain.com'], // Restrict origins for security
+        allowOrigins: ['https://*.yourdomain.com'],
         allowMethods: ['GET'],
         allowHeaders: ['Content-Type', 'Authorization'],
         maxAge: cdk.Duration.hours(1)
       },
-      binaryMediaTypes: ['image/*', 'application/pdf'] // Support binary content
+      binaryMediaTypes: ['image/*', 'application/pdf']
     });
 
-    // Add specific resource instead of proxy
+    // Add specific resource with throttling
     const resource = api.root.addResource('hello');
-    resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction, {
+    const method = resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction, {
       requestTemplates: { 'application/json': '{ "statusCode": "200" }' }
     }));
+
+    // Add throttling at method level
+    const cfnMethod = method.node.defaultChild as apigateway.CfnMethod;
+    cfnMethod.addPropertyOverride('ThrottleSettings', {
+      RateLimit: 100,
+      BurstLimit: 200
+    });
 
     // CloudWatch Alarms for monitoring
     const errorAlarm = new cdk.aws_cloudwatch.Alarm(this, 'LambdaErrorAlarm', {
