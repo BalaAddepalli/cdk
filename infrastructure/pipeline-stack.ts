@@ -29,7 +29,7 @@ export class PipelineStack extends cdk.Stack {
         version: '0.2',
         phases: {
           install: {
-            'runtime-versions': { nodejs: 18 },
+            'runtime-versions': { nodejs: 20 },
             commands: ['npm ci', 'npm install -g aws-cdk'],
           },
           build: {
