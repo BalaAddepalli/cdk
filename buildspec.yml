@@ -9,6 +9,13 @@ phases:
       - npm install -g aws-cdk
   pre_build:
     commands:
+      - echo "Running security scans..."
+      - echo "Dependency vulnerability scan..."
+      - npm audit --audit-level=high --production
+      - echo "SAST scan with Semgrep..."
+      - npx semgrep --config=auto --error --json --output=semgrep-results.json src/
+      - echo "Security scans completed successfully"
+      - echo "Running tests..."
       - npm run test
   build:
     commands:
@@ -21,4 +28,11 @@ phases:
 artifacts:
   files:
     - '**/*'
+    - 'semgrep-results.json'
   name: typescript-lambda-artifacts
+
+reports:
+  semgrep-report:
+    files:
+      - 'semgrep-results.json'
+    file-format: 'SEMGREPJSON'

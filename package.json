@@ -6,7 +6,10 @@
     "build": "tsc",
     "test": "jest --passWithNoTests",
     "deploy": "cdk deploy",
-    "synth": "cdk synth"
+    "synth": "cdk synth",
+    "security:audit": "npm audit --audit-level=high",
+    "security:sast": "npx semgrep --config=auto --error src/",
+    "security:scan": "npm run security:audit && npm run security:sast"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",

@@ -1,0 +1,8 @@
+# Semgrep ignore file
+node_modules/
+dist/
+*.min.js
+*.test.ts
+*.spec.ts
+coverage/
+.git/
