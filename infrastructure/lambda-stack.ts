@@ -9,7 +9,7 @@ export class LambdaStack extends cdk.Stack {
 
     const lambdaFunction = new lambda.Function(this, 'TypeScriptLambda', {
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'handler.handler',
+      handler: 'lambda/handler.handler',
       code: lambda.Code.fromAsset('dist'),
       environment: {
         NODE_ENV: 'production'
