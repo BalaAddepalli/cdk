@@ -6,10 +6,10 @@ import { PipelineStack } from './pipeline-stack';
 
 const app = new cdk.App();
 
-const cicdAccountId = '123456789012';
-const workloadAccountId = '123456789013';
-const githubOwner = 'your-github-username';
-const githubRepo = 'typescript-lambda-project';
+const cicdAccountId = '642244225184';
+const workloadAccountId = '685385421611';
+const githubOwner = 'BalaAddepalli';
+const githubRepo = 'cdk';
 
 // Deploy pipeline in CI/CD account
 new PipelineStack(app, 'TypeScriptLambdaPipeline', {
