@@ -8,7 +8,7 @@
     "deploy": "cdk deploy",
     "synth": "cdk synth",
     "security:audit": "npm audit --audit-level=high",
-    "security:sast": "npx eslint src/ --ext .ts",
+    "security:sast": "eslint src/ --ext .ts",
     "security:scan": "npm run security:audit && npm run security:sast"
   },
   "devDependencies": {
@@ -20,7 +20,11 @@
     "aws-cdk-lib": "^2.90.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",
-    "ts-node": "^10.9.0"
+    "ts-node": "^10.9.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint-plugin-security": "^1.7.1"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7"
