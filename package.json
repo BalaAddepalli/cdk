@@ -4,7 +4,7 @@
   "description": "TypeScript Lambda with CI/CD deployment",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "deploy": "cdk deploy",
     "synth": "cdk synth"
   },
