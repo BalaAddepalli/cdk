@@ -1,0 +1,96 @@
+import * as cdk from 'aws-cdk-lib';
+import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
+import * as codepipeline_actions from 'aws-cdk-lib/aws-codepipeline-actions';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
+
+export class PipelineStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: cdk.StackProps & {
+    workloadAccountId: string;
+    githubRepo: string;
+    githubOwner: string;
+  }) {
+    super(scope, id, props);
+
+    const sourceOutput = new codepipeline.Artifact();
+    const buildOutput = new codepipeline.Artifact();
+
+    const buildProject = new codebuild.PipelineProject(this, 'BuildProject', {
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec.yml'),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+        computeType: codebuild.ComputeType.SMALL,
+      },
+    });
+
+    const crossAccountRole = new iam.Role(this, 'CrossAccountDeployRole', {
+      assumedBy: buildProject.role!,
+      roleName: 'CodePipelineCrossAccountRole',
+      externalIds: [props.workloadAccountId],
+    });
+
+    crossAccountRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['sts:AssumeRole'],
+      resources: [`arn:aws:iam::${props.workloadAccountId}:role/CrossAccountDeploymentRole`],
+    }));
+
+    new codepipeline.Pipeline(this, 'Pipeline', {
+      stages: [
+        {
+          stageName: 'Source',
+          actions: [
+            new codepipeline_actions.GitHubSourceAction({
+              actionName: 'GitHub_Source',
+              owner: props.githubOwner,
+              repo: props.githubRepo,
+              oauthToken: cdk.SecretValue.secretsManager('github-token'),
+              output: sourceOutput,
+            }),
+          ],
+        },
+        {
+          stageName: 'Build',
+          actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Build',
+              project: buildProject,
+              input: sourceOutput,
+              outputs: [buildOutput],
+            }),
+          ],
+        },
+        {
+          stageName: 'Deploy',
+          actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Deploy',
+              project: new codebuild.PipelineProject(this, 'DeployProject', {
+                buildSpec: codebuild.BuildSpec.fromObject({
+                  version: '0.2',
+                  phases: {
+                    install: {
+                      'runtime-versions': { nodejs: 18 },
+                      commands: ['npm ci'],
+                    },
+                    build: {
+                      commands: [
+                        `aws sts assume-role --role-arn arn:aws:iam::${props.workloadAccountId}:role/CrossAccountDeploymentRole --role-session-name pipeline-deploy`,
+                        'cdk deploy --require-approval never',
+                      ],
+                    },
+                  },
+                }),
+                environment: {
+                  buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+                },
+                role: crossAccountRole,
+              }),
+              input: buildOutput,
+            }),
+          ],
+        },
+      ],
+    });
+  }
+}

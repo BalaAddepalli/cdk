@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm ci
+  pre_build:
+    commands:
+      - npm run test
+  build:
+    commands:
+      - npm run build
+      - npm run synth
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
+  name: typescript-lambda-artifacts
