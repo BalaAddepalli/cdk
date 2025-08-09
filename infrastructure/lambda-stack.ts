@@ -202,7 +202,7 @@ export class LambdaStack extends cdk.Stack {
       new cdk.aws_cloudwatch.GraphWidget({
         title: 'DDoS & Abuse Detection',
         left: [lambdaFunction.metricThrottles({ label: 'Throttling Events' })],
-        right: [lambdaFunction.metricConcurrentExecutions({ label: 'Concurrent Executions' })],
+        right: [lambdaFunction.metricInvocations({ label: 'Invocation Rate' })],
         width: 12,
         height: 6
       }),
@@ -302,15 +302,15 @@ export class LambdaStack extends cdk.Stack {
       new cdk.aws_cloudwatch.GraphWidget({
         title: 'Resource Utilization',
         left: [
-          lambdaFunction.metricConcurrentExecutions({ label: 'Concurrent Executions' })
+          lambdaFunction.metricInvocations({ label: 'Invocations' })
         ],
         right: [
           new cdk.aws_cloudwatch.MathExpression({
-            expression: '(m1 / 10) * 100',
+            expression: '(m1 / 600) * 100',
             usingMetrics: {
-              m1: lambdaFunction.metricConcurrentExecutions({ statistic: 'Maximum' })
+              m1: lambdaFunction.metricInvocations({ statistic: 'Sum', period: cdk.Duration.minutes(1) })
             },
-            label: 'Concurrency Utilization (%)'
+            label: 'Invocation Rate (per min)'
           })
         ],
         width: 12,
