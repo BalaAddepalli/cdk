@@ -54,18 +54,38 @@ export class LambdaStack extends cdk.Stack {
       requestTemplates: { 'application/json': '{ "statusCode": "200" }' }
     }));
 
-    // CloudWatch Alarms for monitoring
-    const errorAlarm = new cdk.aws_cloudwatch.Alarm(this, 'LambdaErrorAlarm', {
+    // Security-focused CloudWatch Alarms
+    const securityErrorAlarm = new cdk.aws_cloudwatch.Alarm(this, 'SecurityErrorAlarm', {
+      alarmName: 'TypeScriptLambda-SecurityErrors',
+      alarmDescription: 'High error rate indicating potential security issues',
       metric: lambdaFunction.metricErrors(),
       threshold: 5,
       evaluationPeriods: 2,
       treatMissingData: cdk.aws_cloudwatch.TreatMissingData.NOT_BREACHING
     });
 
-    const durationAlarm = new cdk.aws_cloudwatch.Alarm(this, 'LambdaDurationAlarm', {
+    const apiSecurityAlarm = new cdk.aws_cloudwatch.Alarm(this, 'ApiSecurityAlarm', {
+      alarmName: 'TypeScriptLambda-ApiSecurityEvents',
+      alarmDescription: 'High 4XX error rate indicating potential security attacks',
+      metric: api.metricClientError(),
+      threshold: 10,
+      evaluationPeriods: 2
+    });
+
+    const performanceSecurityAlarm = new cdk.aws_cloudwatch.Alarm(this, 'PerformanceSecurityAlarm', {
+      alarmName: 'TypeScriptLambda-PerformanceAnomaly',
+      alarmDescription: 'Unusual performance patterns that may indicate security issues',
       metric: lambdaFunction.metricDuration(),
       threshold: 5000, // 5 seconds
       evaluationPeriods: 2
+    });
+
+    const throttleSecurityAlarm = new cdk.aws_cloudwatch.Alarm(this, 'ThrottleSecurityAlarm', {
+      alarmName: 'TypeScriptLambda-ThrottleEvents',
+      alarmDescription: 'Lambda throttling events that may indicate DDoS or abuse',
+      metric: lambdaFunction.metricThrottles(),
+      threshold: 1,
+      evaluationPeriods: 1
     });
 
     // API Gateway resource policy for IP restrictions
@@ -100,21 +120,116 @@ export class LambdaStack extends cdk.Stack {
     const cfnApi = api.node.defaultChild as cdk.aws_apigateway.CfnRestApi;
     cfnApi.policy = resourcePolicy;
 
-    // CloudWatch Dashboard
-    const dashboard = new cdk.aws_cloudwatch.Dashboard(this, 'LambdaDashboard', {
-      dashboardName: 'TypeScriptLambda-Monitoring'
+    // Security Metrics Dashboard
+    const dashboard = new cdk.aws_cloudwatch.Dashboard(this, 'SecurityDashboard', {
+      dashboardName: 'TypeScriptLambda-Security-Monitoring'
     });
 
     dashboard.addWidgets(
-      new cdk.aws_cloudwatch.GraphWidget({
-        title: 'Lambda Metrics',
-        left: [lambdaFunction.metricInvocations(), lambdaFunction.metricErrors()],
-        right: [lambdaFunction.metricDuration()]
+      // Security Header
+      new cdk.aws_cloudwatch.TextWidget({
+        markdown: '# Security Metrics Dashboard\n\n**Real-time security monitoring for TypeScript Lambda application**',
+        width: 24,
+        height: 2
       }),
+      
+      // Security KPIs Row
+      new cdk.aws_cloudwatch.SingleValueWidget({
+        title: 'Security Score (%)',
+        metrics: [
+          new cdk.aws_cloudwatch.MathExpression({
+            expression: 'IF(m2 > 0, 100 - ((m1 / m2) * 100), 100)',
+            usingMetrics: {
+              m1: api.metricServerError({ statistic: 'Sum', period: cdk.Duration.hours(1) }),
+              m2: api.metricCount({ statistic: 'Sum', period: cdk.Duration.hours(1) })
+            },
+            label: 'Security Score'
+          })
+        ],
+        width: 6,
+        height: 6
+      }),
+      
+      new cdk.aws_cloudwatch.SingleValueWidget({
+        title: 'Error Rate (%)',
+        metrics: [
+          new cdk.aws_cloudwatch.MathExpression({
+            expression: 'IF(m2 > 0, (m1 / m2) * 100, 0)',
+            usingMetrics: {
+              m1: api.metricServerError({ statistic: 'Sum' }),
+              m2: api.metricCount({ statistic: 'Sum' })
+            },
+            label: 'Error Rate'
+          })
+        ],
+        width: 6,
+        height: 6
+      }),
+      
+      new cdk.aws_cloudwatch.SingleValueWidget({
+        title: 'Failed Requests (24h)',
+        metrics: [
+          api.metricClientError({ statistic: 'Sum', period: cdk.Duration.hours(24), label: '4XX Errors' }),
+          api.metricServerError({ statistic: 'Sum', period: cdk.Duration.hours(24), label: '5XX Errors' })
+        ],
+        width: 6,
+        height: 6
+      }),
+      
+      new cdk.aws_cloudwatch.SingleValueWidget({
+        title: 'Lambda Errors (24h)',
+        metrics: [
+          lambdaFunction.metricErrors({ statistic: 'Sum', period: cdk.Duration.hours(24) })
+        ],
+        width: 6,
+        height: 6
+      }),
+      
+      // Security Events Timeline
       new cdk.aws_cloudwatch.GraphWidget({
-        title: 'API Gateway Metrics',
-        left: [api.metricCount(), api.metricClientError(), api.metricServerError()],
-        right: [api.metricLatency()]
+        title: 'Security Events Timeline',
+        left: [
+          api.metricClientError({ label: '4XX Errors (Client)' }),
+          api.metricServerError({ label: '5XX Errors (Server)' }),
+          lambdaFunction.metricErrors({ label: 'Lambda Errors' })
+        ],
+        width: 12,
+        height: 6,
+        view: cdk.aws_cloudwatch.GraphWidgetView.TIME_SERIES,
+        stacked: false
+      }),
+      
+      new cdk.aws_cloudwatch.GraphWidget({
+        title: 'Request Pattern Analysis',
+        left: [
+          api.metricCount({ label: 'Total Requests' }),
+          lambdaFunction.metricInvocations({ label: 'Lambda Invocations' })
+        ],
+        right: [
+          api.metricLatency({ label: 'API Latency (ms)' }),
+          lambdaFunction.metricDuration({ label: 'Lambda Duration (ms)' })
+        ],
+        width: 12,
+        height: 6
+      }),
+      
+      // Performance Security Metrics
+      new cdk.aws_cloudwatch.GraphWidget({
+        title: 'Lambda Performance & Security',
+        left: [lambdaFunction.metricDuration({ label: 'Duration' })],
+        right: [lambdaFunction.metricThrottles({ label: 'Throttles' })],
+        width: 12,
+        height: 6
+      }),
+      
+      new cdk.aws_cloudwatch.GraphWidget({
+        title: 'API Gateway Security Metrics',
+        left: [
+          api.metricCacheHitCount({ label: 'Cache Hits' }),
+          api.metricCacheMissCount({ label: 'Cache Misses' })
+        ],
+        width: 12,
+        height: 6
       })
     );
 
@@ -124,9 +239,14 @@ export class LambdaStack extends cdk.Stack {
       description: 'Lambda API URL'
     });
 
-    new cdk.CfnOutput(this, 'DashboardUrl', {
+    new cdk.CfnOutput(this, 'SecurityDashboardUrl', {
       value: `https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#dashboards:name=${dashboard.dashboardName}`,
-      description: 'CloudWatch Dashboard URL'
+      description: 'Security Metrics Dashboard URL'
+    });
+
+    new cdk.CfnOutput(this, 'SecurityAlarmsUrl', {
+      value: `https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#alarmsV2:`,
+      description: 'Security Alarms Console URL'
     });
   }
 }
