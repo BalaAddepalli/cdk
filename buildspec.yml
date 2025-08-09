@@ -16,7 +16,7 @@ phases:
       - npx eslint src/ --ext .ts --format json --output-file eslint-security-report.json || echo "ESLint security scan completed"
       - echo "Security scans completed successfully"
       - echo "Running tests..."
-      - npm run test
+      - npm run test:ci
   build:
     commands:
       - npm run build
@@ -38,3 +38,11 @@ reports:
       - 'npm-audit-report.json'
       - 'eslint-security-report.json'
     file-format: 'JSON'
+  test-reports:
+    files:
+      - 'coverage/lcov.info'
+    file-format: 'LCOV'
+  junit-reports:
+    files:
+      - 'junit.xml'
+    file-format: 'JUNITXML'

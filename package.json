@@ -4,7 +4,9 @@
   "description": "TypeScript Lambda with CI/CD deployment",
   "scripts": {
     "build": "tsc",
-    "test": "jest --passWithNoTests",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:ci": "jest --coverage --ci --watchAll=false",
     "deploy": "cdk deploy",
     "synth": "cdk synth",
     "security:audit": "npm audit --audit-level=high",
@@ -24,7 +26,8 @@
     "eslint": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "eslint-plugin-security": "^1.7.1"
+    "eslint-plugin-security": "^1.7.1",
+    "ts-jest": "^29.1.0"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7"

@@ -20,13 +20,13 @@ const log = (level: LogEntry['level'], message: string, details?: any, requestId
 };
 
 export const handler = async (event: any, context: Context): Promise<APIGatewayProxyResult> => {
-  const requestId = event.requestContext?.requestId || context.awsRequestId;
+  const requestId = event?.requestContext?.requestId || context.awsRequestId;
   
   try {
     log('INFO', 'Lambda invocation started', { 
-      httpMethod: event.httpMethod,
-      path: event.path,
-      userAgent: event.headers?.['User-Agent']
+      httpMethod: event?.httpMethod,
+      path: event?.path,
+      userAgent: event?.headers?.['User-Agent']
     }, requestId);
 
     // Simulate some processing
