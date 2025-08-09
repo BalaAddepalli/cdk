@@ -16,7 +16,9 @@ phases:
       - npx eslint src/ --ext .ts --format json --output-file eslint-security-report.json || echo "ESLint security scan completed"
       - echo "Security scans completed successfully"
       - echo "Running basic tests..."
-      - npx jest src/simple.test.js --testMatch="**/simple.test.js" --passWithNoTests --reporters=default --reporters=jest-junit
+      - JEST_JUNIT_OUTPUT_DIR=. JEST_JUNIT_OUTPUT_NAME=junit.xml npx jest src/simple.test.js --testMatch="**/simple.test.js" --passWithNoTests --reporters=default --reporters=jest-junit
+      - echo "Checking if junit.xml was created..."
+      - ls -la junit.xml || echo "junit.xml not found"
   build:
     commands:
       - npm run build
@@ -30,6 +32,7 @@ artifacts:
     - '**/*'
     - 'npm-audit-report.json'
     - 'eslint-security-report.json'
+    - 'junit.xml'
   name: typescript-lambda-artifacts
 
 reports:
