@@ -14,6 +14,9 @@ phases:
       - npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed with findings"
       - echo "SAST scan with ESLint security rules..."
       - npx eslint src/ --ext .ts --format json --output-file eslint-security-report.json || echo "ESLint security scan completed"
+      - echo "Verifying security report contents..."
+      - echo "NPM Audit Report:" && head -20 npm-audit-report.json
+      - echo "ESLint Security Report:" && head -20 eslint-security-report.json
       - echo "Security scans completed successfully"
       - echo "Running basic tests..."
       - npx jest src/simple.test.js --testMatch="**/simple.test.js" --passWithNoTests
@@ -52,7 +55,6 @@ reports:
     files:
       - 'npm-audit-report.json'
       - 'eslint-security-report.json'
-    file-format: 'JSON'
   test-reports:
     files:
       - 'junit.xml'
