@@ -51,10 +51,6 @@ artifacts:
   name: typescript-lambda-artifacts
 
 reports:
-  security-reports:
-    files:
-      - 'npm-audit-report.json'
-      - 'eslint-security-report.json'
   test-reports:
     files:
       - 'junit.xml'
