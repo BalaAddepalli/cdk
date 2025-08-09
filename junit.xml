@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.223">
+  <testsuite name="Basic Tests" errors="0" failures="0" skipped="0" timestamp="2025-08-09T05:41:34" time="0.083" tests="3">
+    <testcase classname="Basic Tests should pass basic test" name="Basic Tests should pass basic test" time="0.001">
+    </testcase>
+    <testcase classname="Basic Tests should validate environment" name="Basic Tests should validate environment" time="0">
+    </testcase>
+    <testcase classname="Basic Tests should have Node.js version" name="Basic Tests should have Node.js version" time="0">
+    </testcase>
+  </testsuite>
+</testsuites>
