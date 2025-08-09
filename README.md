@@ -65,6 +65,7 @@ git push origin main
 - ✅ **Efficient Caching**: Reduces Lambda invocations
 
 ### Security
+- ✅ **Dependency Scanning**: npm audit in CI/CD pipeline (0 vulnerabilities)
 - ✅ **Cross-Account Deployment**: Separation of CI/CD and workload
 - ✅ **IAM Least Privilege**: Minimal required permissions
 - ✅ **API Gateway Security**: CORS, resource policies, IP restrictions
@@ -135,6 +136,9 @@ npm run build
 
 # Run tests
 npm run test
+
+# Run security audit
+npm run security:audit
 
 # Synthesize CDK templates
 npm run synth
