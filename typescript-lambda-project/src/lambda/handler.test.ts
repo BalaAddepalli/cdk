@@ -1,8 +1,11 @@
 import { handler } from './handler';
+import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 describe('Lambda Handler', () => {
+  const mockContext: Context = {} as Context;
+
   it('should return success response', async () => {
-    const event = {
+    const event: Partial<APIGatewayProxyEvent> = {
       httpMethod: 'GET',
       path: '/hello',
       headers: {},
@@ -10,7 +13,7 @@ describe('Lambda Handler', () => {
       body: null
     };
 
-    const result = await handler(event);
+    const result = await handler(event as APIGatewayProxyEvent, mockContext);
 
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body)).toHaveProperty('message');
@@ -18,7 +21,7 @@ describe('Lambda Handler', () => {
   });
 
   it('should handle different HTTP methods', async () => {
-    const event = {
+    const event: Partial<APIGatewayProxyEvent> = {
       httpMethod: 'POST',
       path: '/hello',
       headers: {},
@@ -26,9 +29,9 @@ describe('Lambda Handler', () => {
       body: JSON.stringify({ test: 'data' })
     };
 
-    const result = await handler(event);
+    const result = await handler(event as APIGatewayProxyEvent, mockContext);
 
     expect(result.statusCode).toBe(200);
-    expect(result.headers['Content-Type']).toBe('application/json');
+    expect(result.headers?.['Content-Type']).toBe('application/json');
   });
 });
