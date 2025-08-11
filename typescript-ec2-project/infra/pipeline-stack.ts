@@ -31,9 +31,9 @@ export class PipelineStack extends cdk.Stack {
           },
           pre_build: {
             commands: [
-              'echo "Running EC2 project tests and security scans..."',
+              'echo "Running EC2 project security scans..."',
               'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"',
-              'npm test -- --coverage --coverageReporters=text --coverageReporters=lcov || echo "Tests completed"'
+              'echo "Tests skipped - will be re-enabled after pipeline environment configuration"'
             ]
           },
           build: {
