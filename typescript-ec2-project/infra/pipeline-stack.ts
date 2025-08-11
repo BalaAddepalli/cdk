@@ -79,8 +79,6 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              'npm run build',
-              'npm run synth',
               'cdk deploy TypeScriptEC2Stack --require-approval never'
             ]
           },
