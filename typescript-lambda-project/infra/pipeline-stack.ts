@@ -29,11 +29,8 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              'pwd',
-              'ls -la',
-              'ls -la typescript-lambda-project/ || echo "Directory not found"',
-              'cd typescript-lambda-project && npm run build',
-              'cd typescript-lambda-project && npm run synth'
+              'npm run build',
+              'npm run synth'
             ]
           }
         }

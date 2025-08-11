@@ -31,8 +31,8 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              'cd typescript-ec2-project && npm run build',
-              'cd typescript-ec2-project && npm run synth'
+              'npm run build',
+              'npm run synth'
             ]
           }
         }
