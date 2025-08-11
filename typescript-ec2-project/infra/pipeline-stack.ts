@@ -79,7 +79,7 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              'cdk deploy TypeScriptEC2Stack --require-approval never'
+              'cdk deploy TypeScriptEC2Stack --require-approval never --app "node dist/infra/app.js"'
             ]
           },
           post_build: {
