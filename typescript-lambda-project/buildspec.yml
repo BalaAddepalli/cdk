@@ -5,10 +5,12 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
+      - cd typescript-lambda-project
       - npm ci
       - npm install -g aws-cdk
   pre_build:
     commands:
+      - cd typescript-lambda-project
       - echo "Running Lambda project build..."
       - echo "Running security scans..."
       - echo "Dependency vulnerability scan..."
@@ -37,6 +39,7 @@ phases:
       - cat junit.xml
   build:
     commands:
+      - cd typescript-lambda-project
       - npm run build
       - npm run synth
   post_build:
