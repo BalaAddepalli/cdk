@@ -30,10 +30,15 @@ export class PipelineStack extends cdk.Stack {
         phases: {
           install: {
             'runtime-versions': { nodejs: 22 },
-            commands: ['npm ci', 'npm install -g aws-cdk'],
+            commands: [
+              'cd typescript-lambda-project',
+              'npm ci',
+              'npm install -g aws-cdk'
+            ],
           },
           build: {
             commands: [
+              'cd typescript-lambda-project',
               'cdk deploy TypeScriptLambdaStack --require-approval never',
             ],
           },
