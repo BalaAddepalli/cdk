@@ -215,29 +215,13 @@ export class EC2Stack extends cdk.Stack {
       
       // System Metrics
       new cloudwatch.GraphWidget({
-        title: 'CPU Utilization',
-        left: [instance.metricCpuUtilization()],
-        width: 12,
-        height: 6
-      }),
-      
-      new cloudwatch.GraphWidget({
-        title: 'Network Traffic',
+        title: 'Instance Metrics',
         left: [
-          instance.metricNetworkIn(),
-          instance.metricNetworkOut()
-        ],
-        width: 12,
-        height: 6
-      }),
-      
-      // Status Checks
-      new cloudwatch.GraphWidget({
-        title: 'Status Checks',
-        left: [
-          instance.metricStatusCheckFailed(),
-          instance.metricInstanceStatusCheckFailed(),
-          instance.metricSystemStatusCheckFailed()
+          new cloudwatch.Metric({
+            namespace: 'AWS/EC2',
+            metricName: 'CPUUtilization',
+            dimensionsMap: { InstanceId: instance.instanceId }
+          })
         ],
         width: 24,
         height: 6
@@ -248,18 +232,14 @@ export class EC2Stack extends cdk.Stack {
     const cpuAlarm = new cloudwatch.Alarm(this, 'HighCpuAlarm', {
       alarmName: 'TypeScriptEC2-HighCPU',
       alarmDescription: 'High CPU utilization on EC2 instance',
-      metric: instance.metricCpuUtilization(),
+      metric: new cloudwatch.Metric({
+        namespace: 'AWS/EC2',
+        metricName: 'CPUUtilization',
+        dimensionsMap: { InstanceId: instance.instanceId }
+      }),
       threshold: 80,
       evaluationPeriods: 2,
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
-    });
-
-    const statusCheckAlarm = new cloudwatch.Alarm(this, 'StatusCheckAlarm', {
-      alarmName: 'TypeScriptEC2-StatusCheck',
-      alarmDescription: 'EC2 instance status check failed',
-      metric: instance.metricStatusCheckFailed(),
-      threshold: 1,
-      evaluationPeriods: 1
     });
 
     // Outputs

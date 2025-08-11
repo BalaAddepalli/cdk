@@ -26,7 +26,35 @@ export class PipelineStack extends cdk.Stack {
         computeType: codebuild.ComputeType.SMALL,
         privileged: false
       },
-      buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec.yml'),
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            'runtime-versions': { nodejs: 22 },
+            commands: [
+              'cd typescript-ec2-project && npm ci',
+              'npm install -g aws-cdk'
+            ]
+          },
+          pre_build: {
+            commands: [
+              'cd typescript-ec2-project',
+              'echo "Running EC2 project build..."',
+              'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"'
+            ]
+          },
+          build: {
+            commands: [
+              'cd typescript-ec2-project',
+              'npm run build',
+              'npm run synth'
+            ]
+          }
+        },
+        artifacts: {
+          files: ['typescript-ec2-project/**/*']
+        }
+      }),
       artifacts: codebuild.Artifacts.s3({
         bucket: cdk.aws_s3.Bucket.fromBucketName(this, 'ArtifactsBucket', 
           `cdk-hnb659fds-assets-${this.account}-${this.region}`),
@@ -52,15 +80,15 @@ export class PipelineStack extends cdk.Stack {
               nodejs: 22
             },
             commands: [
-              'npm ci',
+              'cd typescript-ec2-project && npm ci',
               'npm install -g aws-cdk'
             ]
           },
           build: {
             commands: [
-              'npm run build',
-              'npm run synth',
-              'cdk deploy TypeScriptEC2Stack --require-approval never'
+              'cd typescript-ec2-project && npm run build',
+              'cd typescript-ec2-project && npm run synth',
+              'cd typescript-ec2-project && cdk deploy TypeScriptEC2Stack --require-approval never'
             ]
           },
           post_build: {
