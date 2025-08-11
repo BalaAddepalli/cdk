@@ -9,7 +9,8 @@
     "test:ci": "jest --coverage --ci --watchAll=false",
     "deploy": "cdk deploy",
     "synth": "cdk synth",
-    "security:audit": "npm audit --audit-level=high"
+    "security:audit": "npm audit --audit-level=high",
+    "lint": "eslint src/ --ext .ts"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",

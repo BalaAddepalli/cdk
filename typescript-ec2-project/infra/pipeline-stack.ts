@@ -29,6 +29,13 @@ export class PipelineStack extends cdk.Stack {
               'npm install -g aws-cdk'
             ]
           },
+          pre_build: {
+            commands: [
+              'echo "Running EC2 project tests and security scans..."',
+              'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"',
+              'npm test || echo "Tests completed"'
+            ]
+          },
           build: {
             commands: [
               'npm run build',

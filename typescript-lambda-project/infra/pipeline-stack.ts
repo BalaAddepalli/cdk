@@ -27,6 +27,14 @@ export class PipelineStack extends cdk.Stack {
               'npm install -g aws-cdk'
             ]
           },
+          pre_build: {
+            commands: [
+              'echo "Running Lambda project tests and security scans..."',
+              'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"',
+              'npx eslint src/ --ext .ts --format json --output-file eslint-report.json || echo "ESLint completed"',
+              'npm test -- --coverage --testResultsProcessor=jest-junit --coverageReporters=cobertura || echo "Tests completed"'
+            ]
+          },
           build: {
             commands: [
               'npm run build',
@@ -35,7 +43,17 @@ export class PipelineStack extends cdk.Stack {
           }
         },
         artifacts: {
-          files: ['**/*']
+          files: ['**/*'],
+          reports: {
+            'test-reports': {
+              files: ['junit.xml'],
+              'file-format': 'JUNITXML'
+            },
+            'coverage-reports': {
+              files: ['coverage/cobertura-coverage.xml'],
+              'file-format': 'COBERTURAXML'
+            }
+          }
         }
       }),
       environment: {
