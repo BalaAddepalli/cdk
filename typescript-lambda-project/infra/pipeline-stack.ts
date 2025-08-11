@@ -70,7 +70,7 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
-              'cdk deploy TypeScriptLambdaStack --require-approval never'
+              'aws cloudformation deploy --template-file cdk.out/TypeScriptLambdaStack.template.json --stack-name TypeScriptLambdaStack --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset'
             ]
           }
         }
