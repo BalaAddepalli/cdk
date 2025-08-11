@@ -33,9 +33,6 @@ phases:
         EOF
   build:
     commands:
-      - pwd
-      - ls -la
-      - cd typescript-lambda-project
       - npm run build
       - npm run synth
   post_build:
