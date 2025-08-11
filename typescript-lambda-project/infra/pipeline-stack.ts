@@ -35,9 +35,14 @@ export class PipelineStack extends cdk.Stack {
               'npm install -g aws-cdk'
             ]
           },
+          pre_build: {
+            commands: [
+              'cd typescript-lambda-project'
+            ]
+          },
           build: {
             commands: [
-              'cd typescript-lambda-project && cdk deploy TypeScriptLambdaStack --require-approval never'
+              'cdk deploy TypeScriptLambdaStack --require-approval never'
             ]
           }
         }
