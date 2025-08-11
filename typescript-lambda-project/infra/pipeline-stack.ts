@@ -43,6 +43,13 @@ export class PipelineStack extends cdk.Stack {
         },
         artifacts: {
           files: ['**/*']
+        },
+        reports: {
+          'jest-reports': {
+            files: ['coverage/lcov.info'],
+            'file-format': 'CLOVERXML',
+            'base-directory': '.'
+          }
         }
       }),
       environment: {
