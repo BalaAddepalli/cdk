@@ -23,7 +23,7 @@ export class PipelineStack extends cdk.Stack {
           install: {
             'runtime-versions': { nodejs: 22 },
             commands: [
-              'cd typescript-lambda-project && npm ci',
+              'cd typescript-lambda-project && npm install',
               'npm install -g aws-cdk'
             ]
           },
@@ -64,7 +64,7 @@ export class PipelineStack extends cdk.Stack {
           install: {
             'runtime-versions': { nodejs: 22 },
             commands: [
-              'cd typescript-lambda-project && npm ci',
+              'cd typescript-lambda-project && npm install',
               'npm install -g aws-cdk'
             ]
           },
