@@ -178,7 +178,7 @@ export class EC2Stack extends cdk.Stack {
       securityGroup,
       role: ec2Role,
       userData,
-      keyName: 'typescript-ec2-key', // You'll need to create this key pair
+      // keyName: 'typescript-ec2-key', // Removed - not needed for demo
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
       },
@@ -269,8 +269,8 @@ export class EC2Stack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'SSHCommand', {
-      value: `ssh -i ~/.ssh/typescript-ec2-key.pem ec2-user@${instance.instancePublicDnsName}`,
-      description: 'SSH Command to connect to instance'
+      value: `Use AWS Systems Manager Session Manager to connect to instance ${instance.instanceId}`,
+      description: 'Connection method (no SSH key configured)'
     });
   }
 }
