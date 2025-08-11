@@ -33,7 +33,7 @@ export class PipelineStack extends cdk.Stack {
             commands: [
               'echo "Running EC2 project tests and security scans..."',
               'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"',
-              'npm test -- --coverage --coverageReporters=text --coverageReporters=lcov || echo "Tests completed"'
+              'npm test -- --coverage --coverageReporters=text --coverageReporters=cobertura || echo "Tests completed"'
             ]
           },
           build: {
@@ -48,8 +48,8 @@ export class PipelineStack extends cdk.Stack {
         },
         reports: {
           'coverage-reports': {
-            files: ['typescript-ec2-project/coverage/lcov.info'],
-            'file-format': 'CLOVERXML'
+            files: ['typescript-ec2-project/coverage/cobertura-coverage.xml'],
+            'file-format': 'COBERTURAXML'
           }
         }
       }),
