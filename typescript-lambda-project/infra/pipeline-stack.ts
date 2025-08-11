@@ -24,24 +24,8 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
-    const deployProject = new codebuild.PipelineProject(this, 'DeployProjectV2', {
-      buildSpec: codebuild.BuildSpec.fromObject({
-        version: '0.2',
-        phases: {
-          install: {
-            'runtime-versions': { nodejs: 22 },
-            commands: [
-              'cd typescript-lambda-project && npm ci',
-              'npm install -g aws-cdk'
-            ],
-          },
-          build: {
-            commands: [
-              'cd typescript-lambda-project && cdk deploy TypeScriptLambdaStack --require-approval never',
-            ],
-          },
-        },
-      }),
+    const deployProject = new codebuild.PipelineProject(this, 'DeployProjectV3', {
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('deploy-buildspec.yml'),
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
       },
