@@ -145,5 +145,9 @@ export class PipelineStack extends cdk.Stack {
       value: `https://eu-central-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/${pipeline.pipelineName}/view`,
       description: 'CodePipeline Console URL'
     });
+
+    // Add ENVIRONMENT tags to pipeline resources
+    cdk.Tags.of(buildProject).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(deployProject).add('ENVIRONMENT', 'SANDBOX');
   }
 }

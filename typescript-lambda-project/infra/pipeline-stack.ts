@@ -129,5 +129,9 @@ export class PipelineStack extends cdk.Stack {
         },
       ],
     });
+
+    // Add ENVIRONMENT tags to pipeline resources
+    cdk.Tags.of(buildProject).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(deployProject).add('ENVIRONMENT', 'SANDBOX');
   }
 }

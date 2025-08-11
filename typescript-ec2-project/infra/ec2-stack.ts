@@ -197,7 +197,6 @@ export class EC2Stack extends cdk.Stack {
 
     // Add tags for better resource management
     cdk.Tags.of(instance).add('Name', 'TypeScript-EC2-Instance');
-    cdk.Tags.of(instance).add('Environment', 'SANDBOX');
     cdk.Tags.of(instance).add('Project', 'TypeScript-EC2');
     cdk.Tags.of(instance).add('ManagedBy', 'CDK');
 
@@ -241,6 +240,12 @@ export class EC2Stack extends cdk.Stack {
       evaluationPeriods: 2,
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
     });
+
+    // Add ENVIRONMENT tags to all resources
+    cdk.Tags.of(vpc).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(securityGroup).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(instance).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(dashboard).add('ENVIRONMENT', 'SANDBOX');
 
     // Outputs
     new cdk.CfnOutput(this, 'InstanceId', {

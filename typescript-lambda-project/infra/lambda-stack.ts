@@ -328,6 +328,12 @@ export class LambdaStack extends cdk.Stack {
       })
     );
 
+    // Add ENVIRONMENT tags to all resources
+    cdk.Tags.of(lambdaFunction).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(api).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(securityDashboard).add('ENVIRONMENT', 'SANDBOX');
+    cdk.Tags.of(operationsDashboard).add('ENVIRONMENT', 'SANDBOX');
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: api.url + 'hello',
