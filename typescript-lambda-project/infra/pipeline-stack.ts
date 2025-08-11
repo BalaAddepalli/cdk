@@ -31,7 +31,7 @@ export class PipelineStack extends cdk.Stack {
             commands: [
               'echo "Running Lambda project tests and security scans..."',
               'npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"',
-              'npm test || echo "Tests completed"'
+              'npm test -- --coverage --coverageReporters=text --coverageReporters=lcov || echo "Tests completed"'
             ]
           },
           build: {
@@ -45,10 +45,9 @@ export class PipelineStack extends cdk.Stack {
           files: ['**/*']
         },
         reports: {
-          'jest-reports': {
+          'coverage-reports': {
             files: ['coverage/lcov.info'],
-            'file-format': 'CLOVERXML',
-            'base-directory': '.'
+            'file-format': 'CLOVERXML'
           }
         }
       }),
