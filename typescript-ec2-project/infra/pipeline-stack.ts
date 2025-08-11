@@ -35,6 +35,9 @@ export class PipelineStack extends cdk.Stack {
               'npm run synth'
             ]
           }
+        },
+        artifacts: {
+          files: ['**/*']
         }
       }),
       environment: {
