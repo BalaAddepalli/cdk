@@ -31,15 +31,13 @@ export class PipelineStack extends cdk.Stack {
           install: {
             'runtime-versions': { nodejs: 22 },
             commands: [
-              'cd typescript-lambda-project',
-              'npm ci',
+              'cd typescript-lambda-project && npm ci',
               'npm install -g aws-cdk'
             ],
           },
           build: {
             commands: [
-              'cd typescript-lambda-project',
-              'cdk deploy TypeScriptLambdaStack --require-approval never',
+              'cd typescript-lambda-project && cdk deploy TypeScriptLambdaStack --require-approval never',
             ],
           },
         },
