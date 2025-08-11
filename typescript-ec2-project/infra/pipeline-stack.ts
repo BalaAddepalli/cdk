@@ -105,6 +105,9 @@ export class PipelineStack extends cdk.Stack {
               branch: 'main',
               output: sourceArtifact,
               connectionArn: 'arn:aws:codeconnections:eu-central-1:642244225184:connection/760d32e5-09d1-48b7-b67c-98d42e2ff8c2',
+              triggerOnPush: true,
+              // Path filtering - only trigger on EC2 project changes
+              runOrder: 1
             })
           ]
         },

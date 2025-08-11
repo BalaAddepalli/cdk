@@ -178,7 +178,7 @@ export class EC2Stack extends cdk.Stack {
       securityGroup,
       role: ec2Role,
       userData,
-      // keyName: 'typescript-ec2-key', // Removed - not needed for demo
+      // keyName: 'typescript-ec2-key', // Using Session Manager instead
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
       },
@@ -197,7 +197,7 @@ export class EC2Stack extends cdk.Stack {
 
     // Add tags for better resource management
     cdk.Tags.of(instance).add('Name', 'TypeScript-EC2-Instance');
-    cdk.Tags.of(instance).add('Environment', 'Production');
+    cdk.Tags.of(instance).add('Environment', 'SANDBOX');
     cdk.Tags.of(instance).add('Project', 'TypeScript-EC2');
     cdk.Tags.of(instance).add('ManagedBy', 'CDK');
 
