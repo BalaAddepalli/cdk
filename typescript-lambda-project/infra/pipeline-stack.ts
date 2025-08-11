@@ -24,7 +24,7 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
-    const deployProject = new codebuild.PipelineProject(this, 'DeployProject', {
+    const deployProject = new codebuild.PipelineProject(this, 'DeployProjectV2', {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
         phases: {
