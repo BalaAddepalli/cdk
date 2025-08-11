@@ -18,57 +18,19 @@ export class PipelineStack extends cdk.Stack {
     const buildArtifact = new codepipeline.Artifact('BuildArtifact');
 
     // Build project
-    const buildProject = new codebuild.Project(this, 'BuildProject', {
-      projectName: 'TypeScriptEC2-Build',
-      description: 'Build TypeScript EC2 project',
+    const buildProject = new codebuild.PipelineProject(this, 'BuildProject', {
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('ec2-buildspec.yml'),
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
-        computeType: codebuild.ComputeType.SMALL,
-        privileged: false
-      },
-      buildSpec: codebuild.BuildSpec.fromObject({
-        version: '0.2',
-        phases: {
-          install: {
-            'runtime-versions': { nodejs: 22 },
-            commands: [
-              'cd typescript-ec2-project && npm ci',
-              'npm install -g aws-cdk'
-            ]
-          },
-          pre_build: {
-            commands: [
-              'echo "Running EC2 project build..."',
-              'cd typescript-ec2-project && npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"'
-            ]
-          },
-          build: {
-            commands: [
-              'cd typescript-ec2-project && npm run build',
-              'cd typescript-ec2-project && npm run synth'
-            ]
-          }
-        },
-        artifacts: {
-          files: ['typescript-ec2-project/**/*']
-        }
-      }),
-      artifacts: codebuild.Artifacts.s3({
-        bucket: cdk.aws_s3.Bucket.fromBucketName(this, 'ArtifactsBucket', 
-          `cdk-hnb659fds-assets-${this.account}-${this.region}`),
-        includeBuildId: false,
-        packageZip: true
-      })
+        computeType: codebuild.ComputeType.SMALL
+      }
     });
 
     // Deploy project with cross-account permissions
-    const deployProject = new codebuild.Project(this, 'DeployProject', {
-      projectName: 'TypeScriptEC2-Deploy',
-      description: 'Deploy TypeScript EC2 to workload account',
+    const deployProject = new codebuild.PipelineProject(this, 'DeployProject', {
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
-        computeType: codebuild.ComputeType.SMALL,
-        privileged: false
+        computeType: codebuild.ComputeType.SMALL
       },
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
