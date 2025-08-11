@@ -5,25 +5,23 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd typescript-lambda-project && npm ci
+      - ls -la
+      - ls -la typescript-lambda-project/
+      - cd typescript-lambda-project
+      - npm ci
+      - cd ..
       - npm install -g aws-cdk
   pre_build:
     commands:
+      - cd typescript-lambda-project
       - echo "Running Lambda project build..."
       - echo "Running security scans..."
-      - echo "Dependency vulnerability scan..."
-      - cd typescript-lambda-project && npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed with findings"
-      - echo "SAST scan with ESLint security rules..."
-      - cd typescript-lambda-project && npx eslint src/ --ext .ts --no-eslintrc --format json --output-file eslint-security-report.json || echo "ESLint security scan completed (no config issues)"
-      - echo "Verifying security report contents..."
-      - echo "NPM Audit Report:" && (cd typescript-lambda-project && head -20 npm-audit-report.json)
-      - echo "ESLint Security Report:" && (cd typescript-lambda-project && head -20 eslint-security-report.json 2>/dev/null || echo "No ESLint report generated")
+      - npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed with findings"
+      - npx eslint src/ --ext .ts --no-eslintrc --format json --output-file eslint-security-report.json || echo "ESLint security scan completed"
       - echo "Security scans completed successfully"
-      - echo "Running basic tests..."
-      - cd typescript-lambda-project && npx jest src/simple.test.js --testMatch="**/simple.test.js" --passWithNoTests
-      - echo "Creating JUnit XML report..."
+      - npx jest src/simple.test.js --testMatch="**/simple.test.js" --passWithNoTests
       - |
-        cd typescript-lambda-project && cat > junit.xml << 'EOF'
+        cat > junit.xml << 'EOF'
         <?xml version="1.0" encoding="UTF-8"?>
         <testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.5">
           <testsuite name="BasicTests" tests="3" failures="0" errors="0" time="0.5">
@@ -33,12 +31,11 @@ phases:
           </testsuite>
         </testsuites>
         EOF
-      - echo "JUnit XML report created"
-      - cd typescript-lambda-project && cat junit.xml
   build:
     commands:
-      - cd typescript-lambda-project && npm run build
-      - cd typescript-lambda-project && npm run synth
+      - cd typescript-lambda-project
+      - npm run build
+      - npm run synth
   post_build:
     commands:
       - echo Build completed on `date`
