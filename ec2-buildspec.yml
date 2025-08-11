@@ -9,12 +9,13 @@ phases:
       - npm install -g aws-cdk
   pre_build:
     commands:
+      - cd typescript-ec2-project
       - echo "Running EC2 project build..."
-      - cd typescript-ec2-project && npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"
+      - npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"
   build:
     commands:
-      - cd typescript-ec2-project && npm run build
-      - cd typescript-ec2-project && npm run synth
+      - npm run build
+      - npm run synth
   post_build:
     commands:
       - echo Build completed on `date`
