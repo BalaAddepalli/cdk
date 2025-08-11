@@ -48,7 +48,7 @@ export class PipelineStack extends cdk.Stack {
         },
         reports: {
           'coverage-reports': {
-            files: ['coverage/lcov.info'],
+            files: ['typescript-ec2-project/coverage/lcov.info'],
             'file-format': 'CLOVERXML'
           }
         }
