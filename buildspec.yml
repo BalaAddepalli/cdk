@@ -5,8 +5,7 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd typescript-lambda-project
-      - npm ci
+      - cd typescript-lambda-project && npm ci
       - npm install -g aws-cdk
   pre_build:
     commands:
@@ -39,9 +38,8 @@ phases:
       - cat junit.xml
   build:
     commands:
-      - cd typescript-lambda-project
-      - npm run build
-      - npm run synth
+      - cd typescript-lambda-project && npm run build
+      - cd typescript-lambda-project && npm run synth
   post_build:
     commands:
       - echo Build completed on `date`
