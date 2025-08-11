@@ -1,0 +1,138 @@
+import * as cdk from 'aws-cdk-lib';
+import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
+import * as codepipeline_actions from 'aws-cdk-lib/aws-codepipeline-actions';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
+
+export class PipelineStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: cdk.StackProps & {
+    workloadAccountId: string;
+    githubRepo: string;
+    githubOwner: string;
+  }) {
+    super(scope, id, props);
+
+    // Source artifact
+    const sourceArtifact = new codepipeline.Artifact('SourceArtifact');
+    const buildArtifact = new codepipeline.Artifact('BuildArtifact');
+
+    // Build project
+    const buildProject = new codebuild.Project(this, 'BuildProject', {
+      projectName: 'TypeScriptEC2-Build',
+      description: 'Build TypeScript EC2 project',
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+        computeType: codebuild.ComputeType.SMALL,
+        privileged: false
+      },
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec.yml'),
+      artifacts: codebuild.Artifacts.s3({
+        bucket: cdk.aws_s3.Bucket.fromBucketName(this, 'ArtifactsBucket', 
+          `cdk-hnb659fds-assets-${this.account}-${this.region}`),
+        includeBuildId: false,
+        packageZip: true
+      })
+    });
+
+    // Deploy project with cross-account permissions
+    const deployProject = new codebuild.Project(this, 'DeployProject', {
+      projectName: 'TypeScriptEC2-Deploy',
+      description: 'Deploy TypeScript EC2 to workload account',
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+        computeType: codebuild.ComputeType.SMALL,
+        privileged: false
+      },
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            'runtime-versions': {
+              nodejs: 22
+            },
+            commands: [
+              'npm ci',
+              'npm install -g aws-cdk'
+            ]
+          },
+          build: {
+            commands: [
+              'npm run build',
+              'npm run synth',
+              'cdk deploy TypeScriptEC2Stack --require-approval never'
+            ]
+          },
+          post_build: {
+            commands: [
+              'echo Deployment completed on `date`'
+            ]
+          }
+        }
+      })
+    });
+
+    // Add cross-account permissions to deploy project
+    deployProject.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['sts:AssumeRole'],
+      resources: [
+        `arn:aws:iam::${props.workloadAccountId}:role/cdk-hnb659fds-deploy-role-${props.workloadAccountId}-${this.region}`,
+        `arn:aws:iam::${props.workloadAccountId}:role/cdk-hnb659fds-file-publishing-role-${props.workloadAccountId}-${this.region}`
+      ]
+    }));
+
+    // CodePipeline
+    const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
+      pipelineName: 'TypeScriptEC2-Pipeline',
+      restartExecutionOnUpdate: true,
+      stages: [
+        {
+          stageName: 'Source',
+          actions: [
+            new codepipeline_actions.CodeStarConnectionsSourceAction({
+              actionName: 'GitHub_Source',
+              owner: props.githubOwner,
+              repo: props.githubRepo,
+              branch: 'main',
+              output: sourceArtifact,
+              connectionArn: 'arn:aws:codeconnections:eu-central-1:642244225184:connection/760d32e5-09d1-48b7-b67c-98d42e2ff8c2',
+            })
+          ]
+        },
+        {
+          stageName: 'Build',
+          actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Build',
+              project: buildProject,
+              input: sourceArtifact,
+              outputs: [buildArtifact]
+            })
+          ]
+        },
+        {
+          stageName: 'Deploy',
+          actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Deploy',
+              project: deployProject,
+              input: buildArtifact
+            })
+          ]
+        }
+      ]
+    });
+
+    // Outputs
+    new cdk.CfnOutput(this, 'PipelineName', {
+      value: pipeline.pipelineName,
+      description: 'CodePipeline Name'
+    });
+
+    new cdk.CfnOutput(this, 'PipelineUrl', {
+      value: `https://eu-central-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/${pipeline.pipelineName}/view`,
+      description: 'CodePipeline Console URL'
+    });
+  }
+}

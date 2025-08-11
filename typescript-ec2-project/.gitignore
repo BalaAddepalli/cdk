@@ -1,0 +1,11 @@
+node_modules/
+dist/
+cdk.out/
+*.js
+*.d.ts
+.env
+.DS_Store
+coverage/
+junit.xml
+npm-audit-report.json
+eslint-security-report.json

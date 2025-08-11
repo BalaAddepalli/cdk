@@ -1,0 +1,22 @@
+{
+  "name": "typescript-ec2-project",
+  "version": "1.0.0",
+  "description": "TypeScript EC2 with CI/CD deployment",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --coverage",
+    "test:ci": "jest --coverage --ci --watchAll=false",
+    "deploy": "cdk deploy",
+    "synth": "cdk synth",
+    "security:audit": "npm audit --audit-level=high"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "aws-cdk-lib": "^2.210.0",
+    "constructs": "^10.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
