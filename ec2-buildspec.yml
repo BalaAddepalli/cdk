@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - cd typescript-ec2-project && npm ci
+      - npm install -g aws-cdk
+  pre_build:
+    commands:
+      - echo "Running EC2 project build..."
+      - cd typescript-ec2-project && npm audit --audit-level=high --production --json > npm-audit-report.json || echo "Audit completed"
+  build:
+    commands:
+      - cd typescript-ec2-project && npm run build
+      - cd typescript-ec2-project && npm run synth
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - 'typescript-ec2-project/**/*'
+  name: typescript-ec2-artifacts
