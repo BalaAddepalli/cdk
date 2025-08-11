@@ -19,7 +19,24 @@ export class PipelineStack extends cdk.Stack {
 
     // Build project
     const buildProject = new codebuild.PipelineProject(this, 'BuildProject', {
-      buildSpec: codebuild.BuildSpec.fromSourceFilename('ec2-buildspec.yml'),
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            'runtime-versions': { nodejs: 22 },
+            commands: [
+              'cd typescript-ec2-project && npm ci',
+              'npm install -g aws-cdk'
+            ]
+          },
+          build: {
+            commands: [
+              'cd typescript-ec2-project && npm run build',
+              'cd typescript-ec2-project && npm run synth'
+            ]
+          }
+        }
+      }),
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
         computeType: codebuild.ComputeType.SMALL
