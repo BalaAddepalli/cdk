@@ -1,0 +1,157 @@
+<mxfile host="app.diagrams.net" modified="2025-08-09T10:00:00.000Z" agent="5.0" etag="abc123" version="24.7.17" type="device">
+  <diagram name="IAM-Roles-Deployment" id="iam-roles-deployment">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="IAM Roles and Policies - Cross-Account Deployment" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="400" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- CI/CD Account Container -->
+        <mxCell id="cicd-account" value="CI/CD Account (642244225184)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="500" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- CodePipeline Role -->
+        <mxCell id="pipeline-role" value="CodePipeline&#xa;Pipeline-ServiceRole&#xa;&#xa;Permissions:&#xa;• S3 (artifacts)&#xa;• CodeBuild (trigger)&#xa;• CodeConnections&#xa;• CloudWatch (logs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- CodeBuild Role -->
+        <mxCell id="codebuild-role" value="CodeBuild&#xa;DeployProject-ServiceRole&#xa;&#xa;Cross-Account Policy:&#xa;• AssumeRole →&#xa;  Workload Account&#xa;• External ID: hnb659fds" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="120" width="200" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Workload Account Container -->
+        <mxCell id="workload-account" value="Workload Account (685385421611)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="50" y="320" width="1050" height="400" as="geometry" />
+        </mxCell>
+        
+        <!-- CDK Deploy Role -->
+        <mxCell id="deploy-role" value="CDK Deploy Role&#xa;cdk-hnb659fds-deploy-role-*&#xa;&#xa;Permissions:&#xa;• CloudFormation&#xa;• IAM (create roles)&#xa;• Lambda (create)&#xa;• API Gateway&#xa;• CloudWatch&#xa;• S3 (assets)&#xa;&#xa;Trust Policy:&#xa;• CI/CD Account&#xa;• CloudFormation Service&#xa;• External ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="180" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- CDK File Publishing Role -->
+        <mxCell id="file-pub-role" value="CDK File Publishing Role&#xa;cdk-hnb659fds-file-publishing-*&#xa;&#xa;Permissions:&#xa;• S3 (upload assets)&#xa;• KMS (encrypt)&#xa;&#xa;Trust Policy:&#xa;• CI/CD Account&#xa;• External ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="300" y="360" width="180" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- CDK Lookup Role -->
+        <mxCell id="lookup-role" value="CDK Lookup Role&#xa;cdk-hnb659fds-lookup-role-*&#xa;&#xa;Permissions:&#xa;• EC2 (describe)&#xa;• Route53 (list)&#xa;• SSM (get params)&#xa;&#xa;Trust Policy:&#xa;• CI/CD Account&#xa;• External ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="520" y="360" width="180" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- CDK Image Publishing Role -->
+        <mxCell id="image-pub-role" value="CDK Image Publishing Role&#xa;cdk-hnb659fds-image-publishing-*&#xa;&#xa;Purpose:&#xa;• ECR (not used in Lambda)&#xa;&#xa;Trust Policy:&#xa;• CI/CD Account&#xa;• External ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="740" y="360" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- CDK CloudFormation Execution Role -->
+        <mxCell id="cfn-exec-role" value="CDK CloudFormation Exec Role&#xa;cdk-hnb659fds-cfn-exec-role-*&#xa;&#xa;Purpose:&#xa;• CloudFormation operations&#xa;&#xa;Trust Policy:&#xa;• CloudFormation Service&#xa;• CI/CD Account&#xa;• External ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="740" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Cross-Account Arrow -->
+        <mxCell id="cross-account-arrow" value="sts:AssumeRole&#xa;External ID: hnb659fds" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#d79b00;fillColor=#ffe6cc;" edge="1" parent="1" source="codebuild-role" target="deploy-role">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="280" as="sourcePoint" />
+            <mxPoint x="170" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Pipeline to CodeBuild Arrow -->
+        <mxCell id="pipeline-codebuild-arrow" value="Triggers" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="pipeline-role" target="codebuild-role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- CodeBuild to File Publishing Arrow -->
+        <mxCell id="codebuild-filepub-arrow" value="AssumeRole" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d79b00;" edge="1" parent="1" source="codebuild-role" target="file-pub-role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- CodeBuild to Lookup Arrow -->
+        <mxCell id="codebuild-lookup-arrow" value="Uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="1" source="codebuild-role" target="lookup-role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Deploy Role to CFN Exec Arrow -->
+        <mxCell id="deploy-cfnexec-arrow" value="Delegates to" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="deploy-role" target="cfn-exec-role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Security Controls Box -->
+        <mxCell id="security-controls" value="Security Controls&#xa;&#xa;• External ID Protection (hnb659fds)&#xa;• Least Privilege Access&#xa;• Cross-Account Boundaries&#xa;• Separation of Concerns&#xa;• No Long-term Credentials" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="250" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="80" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-cicd" value="CI/CD Account" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="900" y="110" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-workload" value="Workload Account" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="900" y="140" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-bootstrap" value="CDK Bootstrap Role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="900" y="170" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-unused" value="Unused Role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="900" y="200" width="80" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Flow Diagram -->
+        <mxCell id="flow-title" value="Deployment Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="750" width="150" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-1" value="1. GitHub Push" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="50" y="790" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-2" value="2. CodePipeline&#xa;Triggers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="180" y="790" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-3" value="3. CodeBuild&#xa;Assumes Roles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="310" y="790" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-4" value="4. Deploy Role&#xa;Creates Resources" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="440" y="790" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-5" value="5. File Pub Role&#xa;Uploads Assets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="570" y="790" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Flow Arrows -->
+        <mxCell id="flow-arrow-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="flow-1" target="flow-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-arrow-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="flow-2" target="flow-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-arrow-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="flow-3" target="flow-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-arrow-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="flow-4" target="flow-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
