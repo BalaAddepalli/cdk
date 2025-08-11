@@ -70,6 +70,7 @@ export class PipelineStack extends cdk.Stack {
           },
           build: {
             commands: [
+              'npm run build',
               'cdk deploy TypeScriptLambdaStack --require-approval never'
             ]
           }
