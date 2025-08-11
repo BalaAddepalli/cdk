@@ -23,7 +23,7 @@ export class PipelineStack extends cdk.Stack {
           install: {
             'runtime-versions': { nodejs: 22 },
             commands: [
-              'cd typescript-lambda-project && npm install',
+              'cd typescript-lambda-project && npm ci',
               'npm install -g aws-cdk'
             ]
           },
@@ -64,13 +64,13 @@ export class PipelineStack extends cdk.Stack {
           install: {
             'runtime-versions': { nodejs: 22 },
             commands: [
-              'cd typescript-lambda-project && npm install',
+              'cd typescript-lambda-project && npm ci',
               'npm install -g aws-cdk'
             ]
           },
           build: {
             commands: [
-              'aws cloudformation deploy --template-file cdk.out/TypeScriptLambdaStack.template.json --stack-name TypeScriptLambdaStack --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset'
+              'cdk deploy TypeScriptLambdaStack --require-approval never'
             ]
           }
         }
